@@ -2,7 +2,7 @@ from .utils import gen_sql_in_tup, drop_table
 import mysql.connector
 
 class PaperSearchEngine:
-    def __init__(self, db):
+    def __init__(self, db: mysql.connector.MySQLConnection):
         self.db = db
 
     def get_relevant_papers(self, keywords: tuple, search_limit):
@@ -19,14 +19,18 @@ class PaperSearchEngine:
         - A list of tuples representing our search results. Every tuple following the format (paper_id, match_score)
         """
         fields_in_sql = gen_sql_in_tup(len(keywords))
-        get_ids_sql =  'SELECT id FROM FoS where keyword IN ' + fields_in_sql + ';'
+        get_ids_sql =  'SELECT id FROM FoS WHERE keyword IN ' + fields_in_sql + ';'
 
         with self.db.cursor() as cur:
             cur.execute(get_ids_sql, keywords)
             result = cur.fetchall()
             keyword_ids = tuple(row_tuple[0] for row_tuple in result)
 
-        return self.get_relevant_papers_by_id(keyword_ids, search_limit)
+        if len(keyword_ids) == 0:
+            # No matching keywords were found, search cannot be completed
+            return []
+        else:
+            self.get_relevant_papers_by_id(keyword_ids, search_limit)
 
     def get_relevant_papers_by_id(self, keyword_ids: tuple, search_limit):
         """

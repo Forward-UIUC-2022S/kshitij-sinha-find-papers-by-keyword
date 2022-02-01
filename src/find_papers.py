@@ -29,6 +29,8 @@ def main():
     search_results = engine.get_relevant_papers(
         args.keywords, 15)
 
+    print(f"{len(search_results)} papers found\n")
+
     for i, result in enumerate(search_results):
         rank = i + 1
         id, title, abstract, match_score = result
