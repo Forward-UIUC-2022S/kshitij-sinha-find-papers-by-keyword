@@ -4,6 +4,7 @@ This module is responsible for finding research papers that are most relevant to
 
 ## Demo
 [![DEMO VIDEO](/media/video_thumbnail.gif)](https://www.youtube.com/watch?v=y3OsWIen0mo)
+[Demo Video on Youtube](https://www.youtube.com/watch?v=y3OsWIen0mo)
 
 ## Setup
 1) Clone this repo and `cd` into the cloned directory
