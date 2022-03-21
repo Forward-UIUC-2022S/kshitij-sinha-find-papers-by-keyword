@@ -6,6 +6,7 @@ import sys
 import os
 import dotenv
 from find_papers_by_keyword.utils import gen_sql_in_tup
+from find_papers_by_keyword.embeddings_generator import EmbeddingsGenerator
 
 inFile = sys.argv[1]
 
@@ -52,16 +53,16 @@ for i, df in enumerate(reader):
     ids = tuple(df['id'])
     fields_in_sql = gen_sql_in_tup(len(ids))
     get_papers_by_id_sql = f"SELECT PaperId as id, PaperTitle as title FROM Papers WHERE PaperId IN {fields_in_sql};"
-    
-    print(ids)
-    print(type(ids[0]))
 
     with db.cursor(dictionary=True) as dict_cur:
         dict_cur.execute(get_papers_by_id_sql, ids)
         papers = dict_cur.fetchall()
 
     for paper in papers:
-        paper['abstract'] = (converted_df[converted_df['id'] == paper['id']])['Abstract']
+        paper['abstract'] = (converted_df[converted_df['id'] == paper['id']])['Abstract'].values[0]
 
+    generator = EmbeddingsGenerator()
+    embeddings = generator.generate_paper_embeddings(papers)
+    print(embeddings)
     if i >= 5:
         break
