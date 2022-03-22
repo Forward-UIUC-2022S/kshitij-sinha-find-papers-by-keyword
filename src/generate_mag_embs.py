@@ -7,9 +7,9 @@ import os
 import dotenv
 from find_papers_by_keyword.utils import gen_sql_in_tup
 from find_papers_by_keyword.embeddings_generator import EmbeddingsGenerator
-
-inFile = sys.argv[1]
-
+import pickle
+from memory_profiler import profile, memory_usage
+import time
 
 def _get_abstract_from_IA(index_length, inverted_index):
     token_list = [None] * index_length
@@ -28,41 +28,72 @@ def convert(row):
 
         return  _get_abstract_from_IA(index_length, inverted_index)
 
-dotenv.load_dotenv()
+def generate_embeddings_and_save(batch, generator, embs_file, id_to_ind_file):
+    embs, id_to_ind = generator.generate_paper_embeddings(batch)
+    pickle.dump(embs, embs_file)
+    pickle.dump(id_to_ind, id_to_ind_file)
 
-db = mysql.connector.connect(
-    user=os.getenv('MYSQL_USER'), 
-    password=os.getenv('MYSQL_PASS'), 
-    host="mag-2020-09-14.mysql.database.azure.com", 
-    port=3306, 
-    database=os.getenv('MYSQL_DB'), 
-    ssl_ca="DigiCertGlobalRootCA.crt.pem", 
-    ssl_disabled=False
-)
+@profile
+def main():
+    dotenv.load_dotenv()
 
-nrows = 10**4
-chunksize = 4 
-iters = nrows / chunksize
+    db = mysql.connector.connect(
+        user=os.getenv('MYSQL_USER'), 
+        password=os.getenv('MYSQL_PASS'), 
+        host="mag-2020-09-14.mysql.database.azure.com", 
+        port=3306, 
+        database=os.getenv('MYSQL_DB'), 
+        ssl_ca="DigiCertGlobalRootCA.crt.pem", 
+        ssl_disabled=False
+    )
 
-get_papers_by_id_sql = "SELECT * FROM Papers WHERE PaperId IN (%s)"
-
-reader = pd.read_csv(inFile, sep='\t', names=['id', 'IndexedAbstract'], chunksize=4)
-for i, df in enumerate(reader):
-    converted_df = pd.concat([df['id'], df.apply(convert, axis=1)], axis=1, keys=['id', 'Abstract'])
-    
-    ids = tuple(df['id'])
-    fields_in_sql = gen_sql_in_tup(len(ids))
-    get_papers_by_id_sql = f"SELECT PaperId as id, PaperTitle as title FROM Papers WHERE PaperId IN {fields_in_sql};"
-
-    with db.cursor(dictionary=True) as dict_cur:
-        dict_cur.execute(get_papers_by_id_sql, ids)
-        papers = dict_cur.fetchall()
-
-    for paper in papers:
-        paper['abstract'] = (converted_df[converted_df['id'] == paper['id']])['Abstract'].values[0]
+    limit = 10**7
+    get_papers_sql = f"""
+        SELECT papers.PaperId AS id, papers.PaperTitle AS title, paperabstracts.Abstract AS abstract
+        FROM papers
+        JOIN paperabstracts
+        ON papers.PaperId = paperabstracts.PaperId
+        LIMIT {limit}
+    """
 
     generator = EmbeddingsGenerator()
-    embeddings = generator.generate_paper_embeddings(papers)
-    print(embeddings)
-    if i >= 5:
-        break
+    embeddings_file = open("mag_data/mag_embs.pickle", "wb")
+    id_to_ind_file = open("mag_data/mag_id_to_ind.pickle", "wb")
+
+    batch_size = 10**6
+    batch_ind = 0
+    batch_count = 0
+    batch = []
+
+    start = time.time()
+
+    with db.cursor(dictionary=True, buffered=True) as dict_cur:
+        dict_cur.execute(get_papers_sql)
+        print("Done executing")
+
+        for row in dict_cur:
+            if batch_ind == batch_size:
+                generate_embeddings_and_save(batch, generator, embeddings_file, id_to_ind_file)
+
+                batch = []
+                batch_ind = 0
+                batch_count += 1
+
+            batch.append(row)
+            batch_ind += 1
+
+    print(f"Batch length: {len(batch)}")
+    print(f"Batch size: {sys.getsizeof(batch)} bytes")
+    generate_embeddings_and_save(batch, generator, embeddings_file, id_to_ind_file)
+
+    embeddings_file.close()
+    id_to_ind_file.close()
+
+    end = time.time()
+
+    print(f"Total time {end - start}")
+
+if __name__ == "__main__":
+    mem = memory_usage(proc=main)
+
+    print(f"Maximum memory: {max(mem)}")
