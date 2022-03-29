@@ -1,13 +1,15 @@
 import mysql.connector
-import pandas as pd
-import numpy as np
 import json
+import pickle
 import sys
 import os
 import dotenv
+import sql_creds
+
+from find_papers_by_keyword.database import Database
 from find_papers_by_keyword.utils import gen_sql_in_tup
 from find_papers_by_keyword.embeddings_generator import EmbeddingsGenerator
-import pickle
+
 from memory_profiler import profile, memory_usage
 import time
 
@@ -37,7 +39,7 @@ def generate_embeddings_and_save(batch, generator, embs_file, id_to_ind_file):
 def main():
     dotenv.load_dotenv()
 
-    db = mysql.connector.connect(
+    mag_db = mysql.connector.connect(
         user=os.getenv('MYSQL_USER'), 
         password=os.getenv('MYSQL_PASS'), 
         host="mag-2020-09-14.mysql.database.azure.com", 
@@ -47,7 +49,7 @@ def main():
         ssl_disabled=False
     )
 
-    limit = 10**7
+    limit = 100000
     get_papers_sql = f"""
         SELECT papers.PaperId AS id, papers.PaperTitle AS title, paperabstracts.Abstract AS abstract
         FROM papers
@@ -60,31 +62,24 @@ def main():
     embeddings_file = open("mag_data/mag_embs.pickle", "wb")
     id_to_ind_file = open("mag_data/mag_id_to_ind.pickle", "wb")
 
-    batch_size = 10**6
+    batch_size = limit
     batch_ind = 0
     batch_count = 0
     batch = []
 
     start = time.time()
 
-    with db.cursor(dictionary=True, buffered=True) as dict_cur:
+    with mag_db.cursor(dictionary=True) as dict_cur:
         dict_cur.execute(get_papers_sql)
         print("Done executing")
-
-        for row in dict_cur:
-            if batch_ind == batch_size:
-                generate_embeddings_and_save(batch, generator, embeddings_file, id_to_ind_file)
-
-                batch = []
-                batch_ind = 0
-                batch_count += 1
-
-            batch.append(row)
-            batch_ind += 1
+        batch = dict_cur.fetchmany(batch_size)
+        generate_embeddings_and_save(batch, generator, embeddings_file, id_to_ind_file)
+        while batch:
+            batch = dict_cur.fetchmany(batch_size)
+            generate_embeddings_and_save(batch, generator, embeddings_file, id_to_ind_file)
 
     print(f"Batch length: {len(batch)}")
     print(f"Batch size: {sys.getsizeof(batch)} bytes")
-    generate_embeddings_and_save(batch, generator, embeddings_file, id_to_ind_file)
 
     embeddings_file.close()
     id_to_ind_file.close()
