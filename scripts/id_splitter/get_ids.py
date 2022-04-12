@@ -1,4 +1,4 @@
-import json
+import pickle
 import mysql.connector
 import os
 import dotenv
@@ -15,13 +15,13 @@ def main():
         ssl_disabled=False
     )
 
-    id_file = "data/PaperIds.json"
+    id_file = "data/PaperIds.pickle"
     sql = "SELECT PaperId FROM mag_2020_09_14.papers"
 
-    with mag_db.cursor() as cur, open(id_file, "w") as out_file:
+    with mag_db.cursor() as cur, open(id_file, "wb") as out_file:
         cur.execute(sql)
         ids = cur.fetchall()
-        json.dump(ids, out_file)
+        pickle.dump(ids, out_file)
 
 
 if __name__ == "__main__":

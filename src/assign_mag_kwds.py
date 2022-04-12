@@ -65,7 +65,6 @@ def main():
     
     dotenv.load_dotenv()
 
-
     mag_db = mysql.connector.connect(
         user=os.getenv('MYSQL_USER'), 
         password=os.getenv('MYSQL_PASS'), 
@@ -82,7 +81,10 @@ def main():
         embs = pickle.load(embs_file)
         id_to_ind = pickle.load(id_to_ind_file)
 
-        paper_ids = tuple(id_to_ind.keys())[:40000]
+        limit = 100000
+
+        paper_ids = tuple(id_to_ind.keys())[:limit]
+        print(len(paper_ids))
 
         fields_in_sql = gen_sql_in_tup(len(paper_ids))
         get_papers_sql = f"""
@@ -94,12 +96,9 @@ def main():
         dict_cur.execute(get_papers_sql, paper_ids)
         papers = dict_cur.fetchall()
 
-        print(papers[:2])
-        print(keyword_data[:2])
-        print(golden_keywords[:2])
+        # print(papers[1])
 
         assignments = assigner.assign_paper_keywords(papers, keyword_data, golden_keywords, embs, keyword_embeddings, id_to_ind, word_to_other_freq)
-        print(assignments)
 
 if __name__ == "__main__":
     main()

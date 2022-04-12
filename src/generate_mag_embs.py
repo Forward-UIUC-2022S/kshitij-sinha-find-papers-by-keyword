@@ -31,6 +31,8 @@ def convert(row):
         return  _get_abstract_from_IA(index_length, inverted_index)
 
 def generate_embeddings_and_save(batch, generator, embs_file, id_to_ind_file):
+    print(f"Batch length: {len(batch)}")
+    print(f"Batch size: {sys.getsizeof(batch)} bytes")
     embs, id_to_ind = generator.generate_paper_embeddings(batch)
     pickle.dump(embs, embs_file)
     pickle.dump(id_to_ind, id_to_ind_file)
@@ -49,7 +51,8 @@ def main():
         ssl_disabled=False
     )
 
-    limit = 100000
+    limit = 5000
+    batch_size = 1000
     get_papers_sql = f"""
         SELECT papers.PaperId AS id, papers.PaperTitle AS title, paperabstracts.Abstract AS abstract
         FROM papers
@@ -59,27 +62,17 @@ def main():
     """
 
     generator = EmbeddingsGenerator()
-    embeddings_file = open("mag_data/mag_embs.pickle", "wb")
-    id_to_ind_file = open("mag_data/mag_id_to_ind.pickle", "wb")
-
-    batch_size = limit
-    batch_ind = 0
-    batch_count = 0
-    batch = []
+    embeddings_file = open("mag_data/mag_embs_new.pickle", "wb")
+    id_to_ind_file = open("mag_data/mag_id_to_new.pickle", "wb")
 
     start = time.time()
 
     with mag_db.cursor(dictionary=True) as dict_cur:
         dict_cur.execute(get_papers_sql)
-        print("Done executing")
         batch = dict_cur.fetchmany(batch_size)
-        generate_embeddings_and_save(batch, generator, embeddings_file, id_to_ind_file)
         while batch:
-            batch = dict_cur.fetchmany(batch_size)
             generate_embeddings_and_save(batch, generator, embeddings_file, id_to_ind_file)
-
-    print(f"Batch length: {len(batch)}")
-    print(f"Batch size: {sys.getsizeof(batch)} bytes")
+            batch = dict_cur.fetchmany(batch_size)
 
     embeddings_file.close()
     id_to_ind_file.close()
