@@ -4,6 +4,11 @@ import json
 import sys
 import time
 
+"""
+Program arguments: 
+    1: File containing inverted abstract data
+    2: File to save raw abstracts to
+"""
 inFile = sys.argv[1]
 outFile = sys.argv[2]
 
