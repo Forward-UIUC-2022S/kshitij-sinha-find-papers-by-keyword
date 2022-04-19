@@ -145,6 +145,7 @@ sql_creds
 
 # Data folder
 data
+drive_data
 
 # Temp folders
 old_data
