@@ -8,7 +8,6 @@ import sql_creds
 
 from parallel_mag_embs_generator import ParallelMagEmbsGenerator
 
-from memory_profiler import profile, memory_usage
 import time
 
 def compute_chunk(server_count, server_id):

@@ -10,7 +10,7 @@ from find_papers_by_keyword.database import Database
 from find_papers_by_keyword.utils import gen_sql_in_tup
 from find_papers_by_keyword.embeddings_generator import EmbeddingsGenerator
 
-from memory_profiler import profile, memory_usage
+# from memory_profiler import profile, memory_usage
 import time
 
 def _get_abstract_from_IA(index_length, inverted_index):
