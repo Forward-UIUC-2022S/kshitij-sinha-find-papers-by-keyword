@@ -1,26 +1,20 @@
 from find_papers_by_keyword.embeddings_generator import EmbeddingsGenerator
 import pickle
 import mysql.connector
+import sys
 
 class ParallelMagEmbsGenerator:
-    def __init__(self, db, server_count, first_id, last_id):
-        # Assumes uniform distribution of ids on [first_id, last_id]
+    def __init__(self, db):
         self._db = db
         self._generator = EmbeddingsGenerator()
-        self._server_count = server_count
-        self._first_id = first_id
-        self._after_last_id = last_id + 1
 
     def _generate_embeddings_and_save(self, batch, generator, embs_file, id_to_ind_file):
         embs, id_to_ind = generator.generate_paper_embeddings(batch)
         pickle.dump(embs, embs_file)
         pickle.dump(id_to_ind, id_to_ind_file)
 
-    def generate_embs(self, server_id, batch_size, embeddings_file, id_to_ind_file):
+    def generate_embs(self, low_id_lim, high_id_lim, batch_size, embeddings_file, id_to_ind_file):
         # Server_id in [0, server_count)
-        low_id_lim = int(server_id * (self._after_last_id / self._server_count))
-        high_id_lim = int((server_id + 1) * (self._after_last_id / self._server_count)) - 1
-
         get_papers_sql = f"""
         SELECT papers.PaperId AS id, papers.PaperTitle AS title, paperabstracts.Abstract AS abstract
         FROM papers
