@@ -1,0 +1,1 @@
+scp {DigiCertGlobalRootCA.crt.pem,.env,data/PaperIds.pickle,scripts/id_splitter/gen_embs_server.sh,scripts/id_splitter/setup_server.sh} $1:~
