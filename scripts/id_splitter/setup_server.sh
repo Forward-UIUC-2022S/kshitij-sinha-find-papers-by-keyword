@@ -10,5 +10,3 @@ git checkout id-servers;
 python3 -m venv .venv;
 source .venv/bin/activate;
 pip3 install -r requirements.txt;
-
-mv ../PaperIds.pickle data;
