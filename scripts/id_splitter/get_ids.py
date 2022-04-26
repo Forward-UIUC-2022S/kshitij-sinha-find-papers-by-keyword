@@ -15,12 +15,13 @@ def main():
         ssl_disabled=False
     )
 
-    id_file = "data/PaperIds.pickle"
+    id_file = "small_data/PaperIds.pickle"
     sql = "SELECT PaperId FROM mag_2020_09_14.papers"
 
     with mag_db.cursor() as cur, open(id_file, "wb") as out_file:
         cur.execute(sql)
         ids = cur.fetchall()
+        ids = [i[0] for i in ids]
         pickle.dump(ids, out_file)
 
 

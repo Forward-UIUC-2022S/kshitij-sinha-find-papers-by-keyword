@@ -12,8 +12,6 @@ from find_papers_by_keyword.utils import gen_sql_in_tup
 from find_papers_by_keyword.database import Database
 import sql_creds
 
-from memory_profiler import profile
-
 def main():
     parser = argparse.ArgumentParser(
         description="""
@@ -95,7 +93,6 @@ def main():
 
         dict_cur.execute(get_papers_sql, paper_ids)
         papers = dict_cur.fetchall()
-
 
         assignments = assigner.assign_paper_keywords(papers, keyword_data, golden_keywords, embs, keyword_embeddings, id_to_ind, word_to_other_freq)
 
