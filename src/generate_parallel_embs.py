@@ -13,7 +13,7 @@ import time
 def compute_chunk(server_count, server_id):
     import pickle
 
-    with open("small_data/PaperIds.pickle", "rb") as p:
+    with open("data/PaperIds.pickle", "rb") as p:
         ids = pickle.load(p)
 
     chunk_size = int(len(ids) / server_count)
