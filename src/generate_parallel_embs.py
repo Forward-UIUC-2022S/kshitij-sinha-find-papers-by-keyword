@@ -30,11 +30,11 @@ def main():
     dotenv.load_dotenv()
 
     mag_db = mysql.connector.connect(
-        user=os.getenv('MYSQL_USER'), 
-        password=os.getenv('MYSQL_PASS'), 
-        host="mag-2020-09-14.mysql.database.azure.com", 
+        user=os.getenv('MAG_USER'), 
+        password=os.getenv('MAG_PASS'), 
+        host=os.getenv("MAG_HOST"), 
         port=3306, 
-        database=os.getenv('MYSQL_DB'), 
+        database=os.getenv('MAG_DB'), 
         ssl_ca="DigiCertGlobalRootCA.crt.pem", 
         ssl_disabled=False
     )

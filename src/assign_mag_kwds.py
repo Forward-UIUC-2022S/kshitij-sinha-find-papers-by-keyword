@@ -46,11 +46,22 @@ def main():
 
     args = parser.parse_args()
 
+    dotenv.load_dotenv()
     db_conn = mysql.connector.connect(
-        host=sql_creds.db_host,
-        user=sql_creds.db_user,
-        password=sql_creds.db_password,
-        database=sql_creds.db_name
+        host=os.getenv('ASSIGN_HOST'),
+        user=os.getenv('ASSIGN_USER'),
+        password=os.getenv('ASSIGN_PASS'),
+        database=os.getenv('ASSIGN_DB')
+    )
+
+    mag_db = mysql.connector.connect(
+        user=os.getenv('MAG_USER'), 
+        password=os.getenv('MAG_PASS'), 
+        host=os.getenv("MAG_HOST"), 
+        port=3306, 
+        database=os.getenv('MAG_DB'), 
+        ssl_ca="DigiCertGlobalRootCA.crt.pem", 
+        ssl_disabled=False
     )
 
     print("Loading and parsing files...")
@@ -63,18 +74,6 @@ def main():
 
     database = Database(db_conn)
     keyword_data = database.get_keyword_data()
-    
-    dotenv.load_dotenv()
-
-    mag_db = mysql.connector.connect(
-        user=os.getenv('MYSQL_USER'), 
-        password=os.getenv('MYSQL_PASS'), 
-        host="mag-2020-09-14.mysql.database.azure.com", 
-        port=3306, 
-        database=os.getenv('MYSQL_DB'), 
-        ssl_ca="DigiCertGlobalRootCA.crt.pem", 
-        ssl_disabled=False
-    )
 
     assigner = PaperKeywordAssigner()
     csv_header = ['paper_id', 'keyword_id', 'match_score']
@@ -113,7 +112,6 @@ def main():
             csv_out.writerows(assignments)
 
             batch += 1
-
 
 
 if __name__ == "__main__":
