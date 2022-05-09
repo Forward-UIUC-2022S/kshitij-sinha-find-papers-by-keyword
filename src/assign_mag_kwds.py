@@ -2,6 +2,7 @@ import mysql.connector
 import pickle
 import pandas as pd
 import csv
+import json
 
 import argparse
 import os
@@ -40,19 +41,14 @@ def main():
                         help='filepath to pickle containing paper embeddings')
     parser.add_argument('paper_mapping_in', type=str,
                         help='filepath to json mapping paper ids to embedding-matrix rows')
+    parser.add_argument('keyword_data_in', type=str,
+                        help='filpath to json containing keyword data (ids and keywords)')
     parser.add_argument('assignments_out', type=str,
                         help='filepath to csv contains assignments with columns: paper, keyword, score')
 
     args = parser.parse_args()
 
     dotenv.load_dotenv()
-    db_conn = mysql.connector.connect(
-        host=os.getenv('ASSIGN_HOST'),
-        user=os.getenv('ASSIGN_USER'),
-        password=os.getenv('ASSIGN_PASS'),
-        database=os.getenv('ASSIGN_DB')
-    )
-
     mag_db = mysql.connector.connect(
         user=os.getenv('MAG_USER'), 
         password=os.getenv('MAG_PASS'), 
@@ -71,16 +67,16 @@ def main():
     keyword_embeddings = read_pickle_file(args.keyword_embeddings_file)
     word_to_other_freq = read_pickle_file(args.word_to_other_freq_file)
 
-    database = Database(db_conn)
-    keyword_data = database.get_keyword_data()
-
     assigner = PaperKeywordAssigner()
     csv_header = ['paper_id', 'keyword_id', 'match_score']
 
     with open(args.paper_embs_in, "rb") as embs_file, \
          open(args.paper_mapping_in, "rb") as id_to_ind_file, \
+         open(args.keyword_data_in, "r") as keyword_data_file, \
          open(args.assignments_out, "w") as assignments_file, \
          mag_db.cursor(dictionary=True) as dict_cur:
+
+        keyword_data = json.load(keyword_data_file)
 
         embs = pickle.load(embs_file)
         id_to_ind = pickle.load(id_to_ind_file)

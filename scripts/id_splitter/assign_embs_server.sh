@@ -12,7 +12,7 @@ do
         cd find_papers
         source .venv/bin/activate;
         mkdir -p;
-        python3 src/assign_mag_kwds.py data/golden_words.csv data/keyword_embs.pickle data/other_freqs.pickle mag_data/mag_embs.pickle mag_data/mag_id_to_ind.pickle data/assignments.csv;
+        python3 src/assign_mag_kwds.py data/golden_words.csv data/keyword_embs.pickle data/other_freqs.pickle mag_data/mag_embs.pickle mag_data/mag_id_to_ind.pickle data/db_keywords.json data/assignments.csv;
     " &
     ID=$((ID+1))
 done

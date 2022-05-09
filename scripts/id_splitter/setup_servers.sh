@@ -13,7 +13,7 @@ do
         mkdir find_papers/data
 
         mv DigiCertGlobalRootCA.crt.pem .env find_papers;
-        mv keyword_embs.pickle other_freqs.pickle golden_words.csv PaperIds.pickle find_papers/data;
+        mv keyword_embs.pickle other_freqs.pickle golden_words.csv PaperIds.pickle db_keywords.json find_papers/data;
 
         cd find_papers;
         git checkout id-servers;
