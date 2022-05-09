@@ -77,7 +77,7 @@ def main():
         database=os.getenv('ASSIGN_DB')
     )
 
-    indexer = PaperIndexer(db_connection)
+    indexer = PaperIndexer(db_conn)
 
     print("Indexing papers...")
     if load_embeddings:
@@ -91,7 +91,7 @@ def main():
 
     print("Paper indexing complete")
 
-    db_connection.close()
+    db_conn.close()
 
 if __name__ == "__main__":
     main()
