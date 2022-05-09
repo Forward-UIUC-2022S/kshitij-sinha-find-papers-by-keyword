@@ -1,6 +1,7 @@
 import mysql.connector
 import pickle
 import pandas as pd
+import csv
 
 import argparse
 import os
@@ -40,6 +41,8 @@ def main():
                         help='filepath to pickle containing paper embeddings')
     parser.add_argument('paper_mapping_in', type=str,
                         help='filepath to json mapping paper ids to embedding-matrix rows')
+    parser.add_argument('assignments_out', type=str,
+                        help='filepath to csv contains assignments with columns: paper, keyword, score')
 
     args = parser.parse_args()
 
@@ -74,27 +77,44 @@ def main():
     )
 
     assigner = PaperKeywordAssigner()
+    csv_header = ['paper_id', 'keyword_id', 'match_score']
 
-    with open(args.paper_embs_in, "rb") as embs_file, open(args.paper_mapping_in, "rb") as id_to_ind_file, mag_db.cursor(dictionary=True) as dict_cur:
+    with open(args.paper_embs_in, "rb") as embs_file, \
+         open(args.paper_mapping_in, "rb") as id_to_ind_file, \
+         open(args.assignments_out, "w") as assignments_file, \
+         mag_db.cursor(dictionary=True) as dict_cur:
+
         embs = pickle.load(embs_file)
         id_to_ind = pickle.load(id_to_ind_file)
 
-        limit = 1000000
+        paper_ids = tuple(id_to_ind.keys())
 
-        paper_ids = tuple(id_to_ind.keys())[:limit]
+        csv_out = csv.writer(assignments_file)
+        csv_out.writerow(csv_header)
+
+        batch_size = 30000
+        batch = 0
+
         print(len(paper_ids))
+        while batch * batch_size < len(paper_ids):
+            paper_ids_batch = paper_ids[batch_size * batch: batch_size * (batch + 1)]
 
-        fields_in_sql = gen_sql_in_tup(len(paper_ids))
-        get_papers_sql = f"""
-            SELECT papers.PaperId as id, papers.PaperTitle as title, paperabstracts.Abstract as abstract 
-            FROM papers JOIN paperabstracts ON papers.PaperId = paperabstracts.PaperId
-            WHERE papers.PaperId IN {fields_in_sql};
-        """
+            fields_in_sql = gen_sql_in_tup(len(paper_ids_batch))
+            get_papers_sql = f"""
+                SELECT papers.PaperId as id, papers.PaperTitle as title, paperabstracts.Abstract as abstract 
+                FROM papers JOIN paperabstracts ON papers.PaperId = paperabstracts.PaperId
+                WHERE papers.PaperId IN {fields_in_sql};
+            """
 
-        dict_cur.execute(get_papers_sql, paper_ids)
-        papers = dict_cur.fetchall()
+            dict_cur.execute(get_papers_sql, paper_ids_batch)
+            papers = dict_cur.fetchall()
 
-        assignments = assigner.assign_paper_keywords(papers, keyword_data, golden_keywords, embs, keyword_embeddings, id_to_ind, word_to_other_freq)
+            assignments = assigner.assign_paper_keywords(papers, keyword_data, golden_keywords, embs, keyword_embeddings, id_to_ind, word_to_other_freq)
+            csv_out.writerows(assignments)
+
+            batch += 1
+
+
 
 if __name__ == "__main__":
     main()

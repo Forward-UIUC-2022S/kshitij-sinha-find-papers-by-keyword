@@ -39,9 +39,6 @@ def main():
         ssl_disabled=False
     )
 
-    # smallest_id = 9
-    # largest_id = 3084441008
-
     low_lim, high_lim = compute_chunk(server_count, server_id)
 
     batch_size = 100000
