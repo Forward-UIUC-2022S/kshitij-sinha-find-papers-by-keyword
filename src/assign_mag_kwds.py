@@ -11,7 +11,6 @@ from find_papers_by_keyword.assign_paper_keywords import PaperKeywordAssigner
 from find_papers_by_keyword.utils import read_pickle_file, read_json_file
 from find_papers_by_keyword.utils import gen_sql_in_tup
 from find_papers_by_keyword.database import Database
-import sql_creds
 
 def main():
     parser = argparse.ArgumentParser(

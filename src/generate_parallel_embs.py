@@ -1,10 +1,7 @@
 import mysql.connector
-import json
-import pickle
 import sys
 import os
 import dotenv
-import sql_creds
 
 from parallel_mag_embs_generator import ParallelMagEmbsGenerator
 

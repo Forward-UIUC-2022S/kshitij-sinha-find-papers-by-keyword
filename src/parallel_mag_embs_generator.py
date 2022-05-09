@@ -1,7 +1,5 @@
 from find_papers_by_keyword.embeddings_generator import EmbeddingsGenerator
 import pickle
-import mysql.connector
-import sys
 
 class ParallelMagEmbsGenerator:
     def __init__(self, db):
