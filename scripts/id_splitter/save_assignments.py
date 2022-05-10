@@ -1,23 +1,20 @@
-import mysql.connector
-import dotenv
 import os
 import csv
 
 from src.find_papers_by_keyword.database import Database
+import src.database.db_conn_factory as db_factory
 
-dotenv.load_dotenv()
-db_conn = mysql.connector.connect(
-    host=os.getenv('ASSIGN_HOST'),
-    user=os.getenv('ASSIGN_USER'),
-    password=os.getenv('ASSIGN_PASS'),
-    database=os.getenv('ASSIGN_DB')
-)
-
+assignments_dir = "assignments"
+db_conn = db_factory.get_forward_db()
 database = Database(db_conn)
 
-with open("assignments/20.221.200.122.csv", "r") as file:
-    assignment_reader = csv.reader(file)
-    next(assignment_reader)
-    assignments = [row for row in assignment_reader]
+for filename in os.listdir(assignments_dir):
+    filepath = os.path.join(assignments_dir, filename)
+    
+    print("Saving assignments from ", filepath)
+    with open(filepath, "r") as file:
+        assignment_reader = csv.reader(file)
+        next(assignment_reader)
+        assignments = [row for row in assignment_reader]
 
-    database.store_publication_fos(assignments)
+        database.store_publication_fos(assignments)
