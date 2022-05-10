@@ -5,11 +5,10 @@ import csv
 import json
 
 import argparse
-import os
-import dotenv
 
 from find_papers_by_keyword.assign_paper_keywords import PaperKeywordAssigner
-from find_papers_by_keyword.utils import read_pickle_file, read_json_file
+import database.db_conn_factory as db_factory
+from find_papers_by_keyword.utils import read_pickle_file
 from find_papers_by_keyword.utils import gen_sql_in_tup
 
 def main():
@@ -47,16 +46,7 @@ def main():
 
     args = parser.parse_args()
 
-    dotenv.load_dotenv()
-    mag_db = mysql.connector.connect(
-        user=os.getenv('MAG_USER'), 
-        password=os.getenv('MAG_PASS'), 
-        host=os.getenv("MAG_HOST"), 
-        port=3306, 
-        database=os.getenv('MAG_DB'), 
-        ssl_ca="DigiCertGlobalRootCA.crt.pem", 
-        ssl_disabled=False
-    )
+    mag_db = db_factory.get_azure_mag_db()
 
     print("Loading and parsing files...")
 
@@ -93,7 +83,10 @@ def main():
 
             fields_in_sql = gen_sql_in_tup(len(paper_ids_batch))
             get_papers_sql = f"""
-                SELECT id, title, abstract FROM Publication
+                SELECT papers.PaperId AS id, papers.PaperTitle AS title, paperabstracts.Abstract AS abstract
+                FROM papers
+                JOIN paperabstracts
+                ON papers.PaperId = paperabstracts.PaperId
                 WHERE id IN {fields_in_sql};
             """
 
