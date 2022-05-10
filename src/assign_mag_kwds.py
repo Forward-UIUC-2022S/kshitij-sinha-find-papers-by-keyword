@@ -87,7 +87,7 @@ def main():
                 FROM papers
                 JOIN paperabstracts
                 ON papers.PaperId = paperabstracts.PaperId
-                WHERE id IN {fields_in_sql};
+                WHERE papers.PaperId IN {fields_in_sql};
             """
 
             dict_cur.execute(get_papers_sql, paper_ids_batch)
