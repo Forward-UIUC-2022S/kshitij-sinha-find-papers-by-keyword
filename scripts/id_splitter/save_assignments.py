@@ -3,7 +3,7 @@ import dotenv
 import os
 import csv
 
-from src.database.database import Database
+from src.find_papers_by_keyword.database import Database
 
 dotenv.load_dotenv()
 db_conn = mysql.connector.connect(

@@ -1,9 +1,8 @@
 import mysql.connector
 import sys
-import os
-import dotenv
 
 from parallel_mag_embs_generator import ParallelMagEmbsGenerator
+import  database.db_conn_factory as db_factory
 
 def compute_chunk(server_count, server_id):
     import pickle
@@ -21,31 +20,15 @@ def main():
     server_count = int(sys.argv[1])
     server_id = int(sys.argv[2])
 
-    dotenv.load_dotenv()
-
-    mag_db = mysql.connector.connect(
-        user=os.getenv('MAG_USER'), 
-        password=os.getenv('MAG_PASS'), 
-        host=os.getenv("MAG_HOST"), 
-        port=3306, 
-        database=os.getenv('MAG_DB'), 
-        ssl_ca="DigiCertGlobalRootCA.crt.pem", 
-        ssl_disabled=False
-    )
+    mag_db = db_factory.get_forward_db()
 
     low_lim, high_lim = compute_chunk(server_count, server_id)
-
     batch_size = 100000
-
     generator = ParallelMagEmbsGenerator(mag_db)
 
-    embeddings_file = open("mag_data/mag_embs.pickle", "wb")
-    id_to_ind_file = open("mag_data/mag_id_to_ind.pickle", "wb")
-
-    generator.generate_embs(low_lim, high_lim, batch_size, embeddings_file, id_to_ind_file)
-
-    embeddings_file.close()
-    id_to_ind_file.close()
+    with open("mag_data/mag_embs.pickle", "wb") as embeddings_file, \
+         open("mag_data/mag_id_to_ind.pickle", "wb") as id_to_ind_file:
+        generator.generate_embs(low_lim, high_lim, batch_size, embeddings_file, id_to_ind_file)
 
 if __name__ == "__main__":
     main()

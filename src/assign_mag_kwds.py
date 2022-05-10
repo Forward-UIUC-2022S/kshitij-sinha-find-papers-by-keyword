@@ -93,9 +93,8 @@ def main():
 
             fields_in_sql = gen_sql_in_tup(len(paper_ids_batch))
             get_papers_sql = f"""
-                SELECT papers.PaperId as id, papers.PaperTitle as title, paperabstracts.Abstract as abstract 
-                FROM papers JOIN paperabstracts ON papers.PaperId = paperabstracts.PaperId
-                WHERE papers.PaperId IN {fields_in_sql};
+                SELECT id, title, abstract FROM Publication
+                WHERE id IN {fields_in_sql};
             """
 
             dict_cur.execute(get_papers_sql, paper_ids_batch)
