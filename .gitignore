@@ -140,8 +140,12 @@ cython_debug/
 # VSCode
 .DS_Store
 
+# Credentials
+sql_creds
+
 # Data folder
 data
+drive_data
 
 # Temp folders
 old_data

@@ -1,8 +1,6 @@
 from find_papers_by_keyword.paper_search_engine import PaperSearchEngine
-from find_papers_by_keyword.database import Database
-import mysql.connector
+import database.db_conn_factory as db_factory
 import argparse
-import sql_creds
 
 
 def build_result_string(rank, title, abstract, match_score):
@@ -18,12 +16,7 @@ def main():
                         help='keywords in search query. Separate with spaces')
     args = parser.parse_args()
 
-    db_connection = mysql.connector.connect(
-        host=sql_creds.db_host,
-        user=sql_creds.db_user,
-        password=sql_creds.db_password,
-        database=sql_creds.db_name
-    )
+    db_connection = db_factory.get_forward_db()
 
     engine = PaperSearchEngine(db_connection)
     search_results = engine.get_relevant_papers(

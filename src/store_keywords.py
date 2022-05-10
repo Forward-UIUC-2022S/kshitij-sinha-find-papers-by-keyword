@@ -3,7 +3,6 @@ from src.find_papers_by_keyword.database import Database
 from src.find_papers_by_keyword.embeddings_generator import EmbeddingsGenerator
 from src.find_papers_by_keyword.utils import write_pickle_data
 import mysql.connector
-import sql_creds
 
 import argparse
 

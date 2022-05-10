@@ -1,10 +1,10 @@
 import pandas as pd
 from find_papers_by_keyword.paper_indexer import PaperIndexer
-from file_readers.paper_file_reader import PaperFileReader
-from file_readers.keyword_file_reader import KeywordFileReader
+from file_readers.arxiv_paper_reader import PaperFileReader
 from find_papers_by_keyword.utils import read_pickle_file, read_json_file
 import mysql.connector
-import sql_creds
+import dotenv
+import os
 
 import argparse
 
@@ -68,14 +68,15 @@ def main():
     word_to_other_freq = read_pickle_file(args.word_to_other_freq_file)
 
     print("Connecting to database...")
-    db_connection = mysql.connector.connect(
-        host=sql_creds.db_host,
-        user=sql_creds.db_user,
-        password=sql_creds.db_password,
-        database=sql_creds.db_name
+    dotenv.load_dotenv()
+    db_conn = mysql.connector.connect(
+        host=os.getenv('ASSIGN_HOST'),
+        user=os.getenv('ASSIGN_USER'),
+        password=os.getenv('ASSIGN_PASS'),
+        database=os.getenv('ASSIGN_DB')
     )
 
-    indexer = PaperIndexer(db_connection)
+    indexer = PaperIndexer(db_conn)
 
     print("Indexing papers...")
     if load_embeddings:
@@ -89,7 +90,7 @@ def main():
 
     print("Paper indexing complete")
 
-    db_connection.close()
+    db_conn.close()
 
 if __name__ == "__main__":
     main()

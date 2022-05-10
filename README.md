@@ -288,3 +288,11 @@ The goal of this step is receive a set of query keywords and output a list of re
 ## References
 * Code examples from `Forward-UIUC-2021F/guidelines/keyword_assignments`
 * MAG papers from [Open Acaedmic Graph](https://www.microsoft.com/en-us/research/project/open-academic-graph/)
+
+## Notes
+To generate embeddings, `generate_mag_embs.py` connects to an Azure database with paper data. For this work, you need to add the `DigitCertGlobalRootCA.crt.pem` file to the root directory and an environment file called `.env` to the root. The format of `.env` is as follows
+```
+MYSQL_USER=<database username>
+MYSQL_PASS=<database password>
+MYSQL_DB=<database db>
+```
