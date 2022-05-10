@@ -102,6 +102,32 @@ pip install -r requirements
 
     Replace `<limit>` with the number of papers to move to the database. This has been used to demo purposes because the actual MAG data is too large to use for a demo.
 
+    Verify that `data/db_keywords.json` and `data/PaperIds.pickle` now exist.
+
+11) We can now run a series of scripts that perform the paper-indexing on multiple servers. Run the following commands in order
+    ```
+    bash scripts/parallel_servers/move_files '<password>';
+    bash scripts/parallel_servers/setup_servers '<password>';
+    bash scripts/parallel_servers/gen_embs_server '<password>' <num servers>;
+    bash scripts/parallel_servers/assign_embs_server '<password>'
+    ```
+
+    Replace `<password>` with the password of the servers (the passwords need to be common). Replace `<num servers>` with the number of servers being used.
+
+    There should now be an `assignments/` directory in the root folder with a csv file created by every server as specified in `servers.txt`
+12) Move the `csv` data to the Forward database with:
+
+    ```
+    python -m scripts.parallel_servers.save_assignments
+    ```
+13) Finally, we can search for papers with the following command.
+
+    ```
+    python src/find_papers.py [list of keywords]
+    ```
+
+    See above instructions on setting up Arxiv papers for more information on using `find_papers.py`.
+
 ## Changing Paper Search Space
 The `dump.sql` comes with all the intermediate data necessary to search by keywords through the Arxiv dataset. To be able to search through a set of different papers, we need to store the new paper data and do intermediate processing.
 
