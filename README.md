@@ -7,7 +7,7 @@ This module has been updated to rank papers in the MAG corpus. The primary goal 
 ## Demo
 [![DEMO VIDEO](/media/video_thumbnail.gif)](https://www.youtube.com/watch?v=y3OsWIen0mo)
 
-## Setup
+## Setup for Ranking Arxiv Papers
 1) Install necessary module dependencies
 ```
 pip install -r requirements
@@ -21,8 +21,16 @@ mysql -u [user] -p [database_name] < data/dump.sql
 ```
 
 To find papers by keyword, use this module either as command-line utility or a library
+
+The data retrieved from the `dump.sql` file above contains data from the Arxiv corpus. Thus, this module is now ready to rank papers from the Arxiv corpus. The following section provides two ways to rank these papers.
 ### Using as a command-line utility
-1) Replace contants in`src/sql_creds.py` with your database credentials.
+1) Create a `.env` file in the root directory. Populate the file like so:
+    ```
+    ASSIGN_HOST=<database host>
+    ASSIGN_USER=<database user>
+    ASSIGN_PASS=<database password>
+    ASSIGN_DB=<database name>
+    ```
 2) We will use `src/find_papers.py` to find papers by keyword. Run the script using the following command
     ```
     python src/find_papers.py [list of keywords]
@@ -49,6 +57,30 @@ search_engine = PaperSearchEngine(db)
 results = search_engine.get_relevant_papers(("machine learning", "genetic algorithmns"), 15)
 ```
 `results` will be a list of tuples of relevant paper data and the corresponding match score.
+
+## Ranking Papers from MAG Corpus
+Ranking papers from the MAG corpus uses optimizations that require additional setup
+
+1) Install necessary module dependencies
+```
+pip install -r requirements
+```
+2) Download `drive_data.zip` from [Forward Shared Data Drive](https://drive.google.com/drive/u/1/folders/1vq72EBXH38lb7qJbJsBIkHZiOW35NByI). Uncompress the zip file into a folder named `data/`
+3) This module uses MySQL to query paper data. Install MySQL using the [MySQL Installation Guide](https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/)
+4) Create an empty MySQL database
+5) Populate the database using the `dump.sql` file in the `data/` folder
+6) Create a `.env` file in the root directory. Populate the file like so:
+    ```
+    ASSIGN_HOST=<database host>
+    ASSIGN_USER=<database user>
+    ASSIGN_PASS=<database password>
+    ASSIGN_DB=<database name>
+    
+    MAG_HOST=<MAG database host>
+    MAG_USER=<MAG database user>
+    MAG_PASS=<MAG database password>
+    MAG_DB=<MAG database name>
+    ```
 
 ## Changing Paper Search Space
 The `dump.sql` comes with all the intermediate data necessary to search by keywords through the Arxiv dataset. To be able to search through a set of different papers, we need to store the new paper data and do intermediate processing.
