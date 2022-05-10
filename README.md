@@ -6,19 +6,28 @@ This module has been updated to rank papers in the MAG corpus. The primary goal 
 
 ## Demo
 [![DEMO VIDEO](/media/video_thumbnail.gif)](https://www.youtube.com/watch?v=y3OsWIen0mo)
+[Demo Video on Youtube](https://www.youtube.com/watch?v=y3OsWIen0mo)
 
 ## Setup for Ranking Arxiv Papers
-1) Install necessary module dependencies
-```
-pip install -r requirements
-```
-2) Download `drive_data.zip` from [Forward Shared Data Drive](https://drive.google.com/drive/u/1/folders/1vq72EBXH38lb7qJbJsBIkHZiOW35NByI). Uncompress the zip file into a folder named `data/`
-3) This module uses MySQL to query paper data. Install MySQL using the [MySQL Installation Guide](https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/)
-4) Create an empty MySQL database
-5) Populate the database using the `dump.sql` file in the `data/` folder
-```
-mysql -u [user] -p [database_name] < data/dump.sql
-```
+1) Clone this repo and `cd` into the cloned directory
+2) Install necessary module dependencies
+    ```
+    pip install -r requirements
+    ```
+3) Download `drive_data.zip` from [Forward Shared Data Drive](https://drive.google.com/drive/u/1/folders/1vq72EBXH38lb7qJbJsBIkHZiOW35NByI). Uncompress the zip file into a folder named `data/`
+4) This module uses MySQL to query paper data. Install MySQL using the [MySQL Installation Guide](https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/)
+5) Log into MySQL and create an empty MySQL database
+    ```
+    MySQL -u [user] -p
+    ```
+    MySQL will prompt you to enter the password for `[user]`. Once logged in:
+    ```
+    CREATE DATABASE [database_name]
+    ```
+7) Populate the database using the `dump.sql` file in the `data/` folder
+    ```
+    mysql -u [user] -p [database_name] < data/dump.sql
+    ```
 
 To find papers by keyword, use this module either as command-line utility or a library
 
