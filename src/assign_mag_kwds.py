@@ -89,7 +89,6 @@ def main():
         batch_size = 30000
         batch = 0
 
-        print(len(paper_ids))
         while batch * batch_size < len(paper_ids):
             paper_ids_batch = paper_ids[batch_size * batch: batch_size * (batch + 1)]
 

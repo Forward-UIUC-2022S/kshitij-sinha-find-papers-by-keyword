@@ -15,8 +15,7 @@ def compute_chunk(server_count, server_id):
 
     chunk_size = int(len(ids) / server_count)
     low = chunk_size * server_id
-    high = low + chunk_size
-    print(type(low), type(high))
+    high = min(low + chunk_size, len(ids) - 1)
     return ids[low], ids[high]
     
 
