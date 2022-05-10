@@ -94,21 +94,13 @@ pip install -r requirements
     ...
     ```
 9) Acquire `DigiCertGlobalRootCA.crt.pem` by talking to the owner of the MAG database (Ashutosh Ukey)
-10) We need to add the MAG papers to the Forward database. Run a `move_mag_database` script to do this.
+10) We need to add the MAG papers to the Forward database. Once these papers are added, we also need to create two helper files (`db_keywords.json` and `PaperIds.pickle`) to help with batching and paper assignment. To do this setup, run the following command
 
     ```
-    python -m scripts.move_mag_database <limit>
+    python -m src.parallel_setup.setup_mag_data <limit>
     ```
 
     Replace `<limit>` with the number of papers to move to the database. This has been used to demo purposes because the actual MAG data is too large to use for a demo.
-
-11) Run the `get_ids.py` script to save a pickle file of the Paper ID's. This is used to quickly retrieve the list of all id's in our database, which is useful in generating embeddings in batches.
-
-    ```
-    python -m scripts.get_ids.py
-    ```
-    Verify that a the `PaperIds.pickle` file is now in the `data/` directory.
-
 
 ## Changing Paper Search Space
 The `dump.sql` comes with all the intermediate data necessary to search by keywords through the Arxiv dataset. To be able to search through a set of different papers, we need to store the new paper data and do intermediate processing.
