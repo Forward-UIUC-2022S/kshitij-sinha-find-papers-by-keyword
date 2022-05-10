@@ -72,10 +72,10 @@ pip install -r requirements
 6) Populate the database using the `dump.sql` file in the `data/` folder
 7) Create a `.env` file in the root directory. Populate the file like so:
     ```
-    ASSIGN_HOST=<database host>
-    ASSIGN_USER=<database user>
-    ASSIGN_PASS=<database password>
-    ASSIGN_DB=<database name>
+    ASSIGN_HOST=<FORWARD database host>
+    ASSIGN_USER=<FORWARD database user>
+    ASSIGN_PASS=<FORWARD database password>
+    ASSIGN_DB=< FORWARDdatabase name>
 
     MAG_HOST=<MAG database host>
     MAG_USER=<MAG database user>
@@ -83,7 +83,9 @@ pip install -r requirements
     MAG_DB=<MAG database name>
     ```
 
-    Here, the MAG database is a database containing MAG data. The database must contain a `papers` table with the columns `PaperId`, `PaperTitle`, `CitationCount`. The database must also contain a `paperabstracts` table with the colunms `PaperId`, `PaperAbstract`.
+    Here, FORWAD database is the database we populated in step 5.
+
+    The MAG database is a database containing MAG data. The database must contain a `papers` table with the columns `PaperId`, `PaperTitle`, `CitationCount`. The database must also contain a `paperabstracts` table with the colunms `PaperId`, `PaperAbstract`.
 8) Create a file `servers.txt` in the root folder. Populate it with the IP addresses of the servers you wish to parallelize your task on. The `servers.txt` should use the following form:
     ```
     <Server 1 IP>
@@ -91,6 +93,22 @@ pip install -r requirements
     <Server 3 IP>
     ...
     ```
+9) Acquire `DigiCertGlobalRootCA.crt.pem` by talking to the owner of the MAG database (Ashutosh Ukey)
+10) We need to add the MAG papers to the Forward database. Run a `move_mag_database` script to do this.
+
+    ```
+    python -m scripts.move_mag_database <limit>
+    ```
+
+    Replace `<limit>` with the number of papers to move to the database. This has been used to demo purposes because the actual MAG data is too large to use for a demo.
+
+11) Run the `get_ids.py` script to save a pickle file of the Paper ID's. This is used to quickly retrieve the list of all id's in our database, which is useful in generating embeddings in batches.
+
+    ```
+    python -m scripts.get_ids.py
+    ```
+    Verify that a the `PaperIds.pickle` file is now in the `data/` directory.
+
 
 ## Changing Paper Search Space
 The `dump.sql` comes with all the intermediate data necessary to search by keywords through the Arxiv dataset. To be able to search through a set of different papers, we need to store the new paper data and do intermediate processing.
