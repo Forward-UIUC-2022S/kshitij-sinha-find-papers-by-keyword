@@ -1,5 +1,5 @@
 from find_papers_by_keyword.paper_search_engine import PaperSearchEngine
-import mysql.connector
+import database.db_conn_factory as db_factory
 import argparse
 
 
@@ -16,12 +16,7 @@ def main():
                         help='keywords in search query. Separate with spaces')
     args = parser.parse_args()
 
-    db_connection = mysql.connector.connect(
-        host=sql_creds.db_host,
-        user=sql_creds.db_user,
-        password=sql_creds.db_password,
-        database=sql_creds.db_name
-    )
+    db_connection = db_factory.get_forward_db()
 
     engine = PaperSearchEngine(db_connection)
     search_results = engine.get_relevant_papers(
