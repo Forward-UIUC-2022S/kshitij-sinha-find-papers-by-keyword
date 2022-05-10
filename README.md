@@ -2,6 +2,8 @@
 
 This module is responsible for finding research papers that are most relevant to a set of query keywords. The list of papers should be ranked by their relavance to the keywords.
 
+This module has been updated to rank papers in the MAG corpus. The primary goal of this semester to was to optimize the `find-papers-by-keyword` to rank papers from over 200 GB of data. This optimizations include batching the computation to reduce memory ussage and to parallelize computation over multiple servers. 
+
 ## Demo
 [![DEMO VIDEO](/media/video_thumbnail.gif)](https://www.youtube.com/watch?v=y3OsWIen0mo)
 
