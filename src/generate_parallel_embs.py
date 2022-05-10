@@ -1,7 +1,6 @@
-import mysql.connector
 import sys
 
-from parallel_mag_embs_generator import ParallelMagEmbsGenerator
+from find_papers_by_keyword.parallel_mag_embs_generator import ParallelMagEmbsGenerator
 import  database.db_conn_factory as db_factory
 
 def compute_chunk(server_count, server_id):
@@ -20,7 +19,7 @@ def main():
     server_count = int(sys.argv[1])
     server_id = int(sys.argv[2])
 
-    mag_db = db_factory.get_forward_db()
+    mag_db = db_factory.get_azure_mag_db()
 
     low_lim, high_lim = compute_chunk(server_count, server_id)
     batch_size = 100000

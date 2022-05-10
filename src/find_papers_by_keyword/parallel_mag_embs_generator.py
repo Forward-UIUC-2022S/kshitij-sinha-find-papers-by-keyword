@@ -1,4 +1,4 @@
-from find_papers_by_keyword.embeddings_generator import EmbeddingsGenerator
+from .embeddings_generator import EmbeddingsGenerator
 import pickle
 
 class ParallelMagEmbsGenerator:
@@ -14,8 +14,11 @@ class ParallelMagEmbsGenerator:
     def generate_embs(self, low_id_lim, high_id_lim, batch_size, embeddings_file, id_to_ind_file):
         # Server_id in [0, server_count)
         get_papers_sql = f"""
-        SELECT id, title, abstract FROM Publication
-        WHERE id BETWEEN {low_id_lim} AND {high_id_lim}
+            SELECT papers.PaperId AS id, papers.PaperTitle AS title, paperabstracts.Abstract AS abstract
+            FROM papers
+            JOIN paperabstracts
+            ON papers.PaperId = paperabstracts.PaperId
+            WHERE papers.PaperId BETWEEN {low_id_lim} AND {high_id_lim}
         """
 
         print(f"Generating embeddings for ID's between {low_id_lim} and {high_id_lim}")
