@@ -65,11 +65,12 @@ Ranking papers from the MAG corpus uses optimizations that require additional se
 ```
 pip install -r requirements
 ```
-2) Download `drive_data.zip` from [Forward Shared Data Drive](https://drive.google.com/drive/u/1/folders/1vq72EBXH38lb7qJbJsBIkHZiOW35NByI). Uncompress the zip file into a folder named `data/`
-3) This module uses MySQL to query paper data. Install MySQL using the [MySQL Installation Guide](https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/)
-4) Create an empty MySQL database
-5) Populate the database using the `dump.sql` file in the `data/` folder
-6) Create a `.env` file in the root directory. Populate the file like so:
+2) Install [sshpass](https://www.cyberciti.biz/faq/noninteractive-shell-script-ssh-password-provider/) on your machine. This will be used to automate logging in to the parallel servers.
+3) Download `drive_data.zip` from [Forward Shared Data Drive](https://drive.google.com/drive/u/1/folders/1vq72EBXH38lb7qJbJsBIkHZiOW35NByI). Uncompress the zip file into a folder named `data/`
+4) This module uses MySQL to query paper data. Install MySQL using the [MySQL Installation Guide](https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/)
+5) Create an empty MySQL database
+6) Populate the database using the `dump.sql` file in the `data/` folder
+7) Create a `.env` file in the root directory. Populate the file like so:
     ```
     ASSIGN_HOST=<database host>
     ASSIGN_USER=<database user>
@@ -83,6 +84,13 @@ pip install -r requirements
     ```
 
     Here, the MAG database is a database containing MAG data. The database must contain a `papers` table with the columns `PaperId`, `PaperTitle`, `CitationCount`. The database must also contain a `paperabstracts` table with the colunms `PaperId`, `PaperAbstract`.
+8) Create a file `servers.txt` in the root folder. Populate it with the IP addresses of the servers you wish to parallelize your task on. The `servers.txt` should use the following form:
+    ```
+    <Server 1 IP>
+    <Server 2 IP>
+    <Server 3 IP>
+    ...
+    ```
 
 ## Changing Paper Search Space
 The `dump.sql` comes with all the intermediate data necessary to search by keywords through the Arxiv dataset. To be able to search through a set of different papers, we need to store the new paper data and do intermediate processing.
