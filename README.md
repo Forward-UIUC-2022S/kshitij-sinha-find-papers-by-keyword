@@ -75,12 +75,14 @@ pip install -r requirements
     ASSIGN_USER=<database user>
     ASSIGN_PASS=<database password>
     ASSIGN_DB=<database name>
-    
+
     MAG_HOST=<MAG database host>
     MAG_USER=<MAG database user>
     MAG_PASS=<MAG database password>
     MAG_DB=<MAG database name>
     ```
+
+    Here, the MAG database is a database containing MAG data. The database must contain a `papers` table with the columns `PaperId`, `PaperTitle`, `CitationCount`. The database must also contain a `paperabstracts` table with the colunms `PaperId`, `PaperAbstract`.
 
 ## Changing Paper Search Space
 The `dump.sql` comes with all the intermediate data necessary to search by keywords through the Arxiv dataset. To be able to search through a set of different papers, we need to store the new paper data and do intermediate processing.
