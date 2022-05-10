@@ -1,5 +1,5 @@
 from src.file_readers.keyword_file_reader import KeywordFileReader
-from src.database.database import Database
+from src.find_papers_by_keyword.database import Database
 from src.find_papers_by_keyword.embeddings_generator import EmbeddingsGenerator
 from src.find_papers_by_keyword.utils import write_pickle_data
 import mysql.connector

@@ -1,4 +1,4 @@
-from .database import Database
+from database import Database
 from .embeddings_generator import EmbeddingsGenerator
 from .assign_paper_keywords import PaperKeywordAssigner
 from .utils import write_pickle_data, write_json_data

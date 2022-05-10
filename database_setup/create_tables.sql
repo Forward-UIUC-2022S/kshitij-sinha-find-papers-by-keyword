@@ -1,3 +1,4 @@
+CREATE DATABASE assign_paper_kwds CHARACTER SET utf8mb4
 USE assign_paper_kwds;
 
 CREATE TABLE FoS(
