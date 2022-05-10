@@ -1,9 +1,10 @@
 import src.database.db_conn_factory as db_factory
+import sys
 
 mag_conn = db_factory.get_azure_mag_db()
 forward_conn = db_factory.get_forward_db()
 
-limit = 1000000
+limit = sys.argv[1]
 
 with mag_conn.cursor() as mag_cur, forward_conn.cursor() as forward_cur:
     get_papers_sql = f"""
