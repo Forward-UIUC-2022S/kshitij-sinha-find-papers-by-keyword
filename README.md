@@ -2,11 +2,13 @@
 
 This module is responsible for finding research papers that are most relevant to a set of query keywords. The list of papers should be ranked by their relavance to the keywords.
 
+This module has been updated to rank papers in the MAG corpus. The primary goal of this semester to was to optimize the `find-papers-by-keyword` to rank papers from over 200 GB of data. This optimizations include batching the computation to reduce memory ussage and to parallelize computation over multiple servers. 
+
 ## Demo
 [![DEMO VIDEO](/media/video_thumbnail.gif)](https://www.youtube.com/watch?v=y3OsWIen0mo)
 [Demo Video on Youtube](https://www.youtube.com/watch?v=y3OsWIen0mo)
 
-## Setup
+## Setup for Ranking Arxiv Papers
 1) Clone this repo and `cd` into the cloned directory
 2) Install necessary module dependencies
     ```
@@ -28,8 +30,16 @@ This module is responsible for finding research papers that are most relevant to
     ```
 
 To find papers by keyword, use this module either as command-line utility or a library
+
+The data retrieved from the `dump.sql` file above contains data from the Arxiv corpus. Thus, this module is now ready to rank papers from the Arxiv corpus. The following section provides two ways to rank these papers.
 ### Using as a command-line utility
-1) Replace contants in`src/sql_creds.py` with your database credentials.
+1) Create a `.env` file in the root directory. Populate the file like so:
+    ```
+    ASSIGN_HOST=<database host>
+    ASSIGN_USER=<database user>
+    ASSIGN_PASS=<database password>
+    ASSIGN_DB=<database name>
+    ```
 2) We will use `src/find_papers.py` to find papers by keyword. Run the script using the following command
     ```
     python src/find_papers.py [list of keywords]
@@ -56,6 +66,76 @@ search_engine = PaperSearchEngine(db)
 results = search_engine.get_relevant_papers(("machine learning", "genetic algorithmns"), 15)
 ```
 `results` will be a list of tuples of relevant paper data and the corresponding match score.
+
+## Ranking Papers from MAG Corpus
+Ranking papers from the MAG corpus uses optimizations that require additional setup
+
+1) Install necessary module dependencies
+```
+pip install -r requirements
+```
+2) Install [sshpass](https://www.cyberciti.biz/faq/noninteractive-shell-script-ssh-password-provider/) on your machine. This will be used to automate logging in to the parallel servers.
+3) Download `drive_data.zip` from [Forward Shared Data Drive](https://drive.google.com/drive/u/1/folders/1vq72EBXH38lb7qJbJsBIkHZiOW35NByI). Uncompress the zip file into a folder named `data/`
+4) This module uses MySQL to query paper data. Install MySQL using the [MySQL Installation Guide](https://dev.mysql.com/doc/mysql-installation-excerpt/5.7/en/)
+5) Create an empty MySQL database
+6) Populate the database using the `dump.sql` file in the `data/` folder
+7) Create a `.env` file in the root directory. Populate the file like so:
+    ```
+    ASSIGN_HOST=<FORWARD database host>
+    ASSIGN_USER=<FORWARD database user>
+    ASSIGN_PASS=<FORWARD database password>
+    ASSIGN_DB=< FORWARDdatabase name>
+
+    MAG_HOST=<MAG database host>
+    MAG_USER=<MAG database user>
+    MAG_PASS=<MAG database password>
+    MAG_DB=<MAG database name>
+    ```
+
+    Here, FORWAD database is the database we populated in step 5.
+
+    The MAG database is a database containing MAG data. The database must contain a `papers` table with the columns `PaperId`, `PaperTitle`, `CitationCount`. The database must also contain a `paperabstracts` table with the colunms `PaperId`, `PaperAbstract`.
+8) Create a file `servers.txt` in the root folder. Populate it with the IP addresses of the servers you wish to parallelize your task on. The `servers.txt` should use the following form:
+    ```
+    <Server 1 IP>
+    <Server 2 IP>
+    <Server 3 IP>
+    ...
+    ```
+9) Acquire `DigiCertGlobalRootCA.crt.pem` by talking to the owner of the MAG database (Ashutosh Ukey)
+10) We need to add the MAG papers to the Forward database. Once these papers are added, we also need to create two helper files (`db_keywords.json` and `PaperIds.pickle`) to help with batching and paper assignment. To do this setup, run the following command
+
+    ```
+    python -m src.parallel_setup.setup_mag_data <limit>
+    ```
+
+    Replace `<limit>` with the number of papers to move to the database. This has been used to demo purposes because the actual MAG data is too large to use for a demo.
+
+    Verify that `data/db_keywords.json` and `data/PaperIds.pickle` now exist.
+
+11) We can now run a series of scripts that perform the paper-indexing on multiple servers. Run the following commands in order
+    ```
+    bash scripts/parallel_servers/move_files '<password>';
+    bash scripts/parallel_servers/setup_servers '<password>';
+    bash scripts/parallel_servers/gen_embs_server '<password>' <num servers>;
+    bash scripts/parallel_servers/assign_embs_server '<password>'
+    ```
+
+    Replace `<password>` with the password of the servers (the passwords need to be common). Replace `<num servers>` with the number of servers being used.
+
+    There should now be an `assignments/` directory in the root folder with a csv file created by every server as specified in `servers.txt`
+12) Move the `csv` data to the Forward database with:
+
+    ```
+    python -m scripts.parallel_servers.save_assignments
+    ```
+13) Finally, we can search for papers with the following command.
+
+    ```
+    python src/find_papers.py [list of keywords]
+    ```
+
+    See above instructions on setting up Arxiv papers for more information on using `find_papers.py`.
 
 ## Changing Paper Search Space
 The `dump.sql` comes with all the intermediate data necessary to search by keywords through the Arxiv dataset. To be able to search through a set of different papers, we need to store the new paper data and do intermediate processing.
