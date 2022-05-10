@@ -1,7 +1,6 @@
 import pandas as pd
 from find_papers_by_keyword.paper_indexer import PaperIndexer
 from file_readers.arxiv_paper_reader import PaperFileReader
-from file_readers.keyword_file_reader import KeywordFileReader
 from find_papers_by_keyword.utils import read_pickle_file, read_json_file
 import mysql.connector
 import dotenv

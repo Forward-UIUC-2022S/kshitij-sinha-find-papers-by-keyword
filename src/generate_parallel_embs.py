@@ -5,8 +5,6 @@ import dotenv
 
 from parallel_mag_embs_generator import ParallelMagEmbsGenerator
 
-import time
-
 def compute_chunk(server_count, server_id):
     import pickle
 

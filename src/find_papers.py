@@ -1,8 +1,6 @@
 from find_papers_by_keyword.paper_search_engine import PaperSearchEngine
-from find_papers_by_keyword.database import Database
 import mysql.connector
 import argparse
-import sql_creds
 
 
 def build_result_string(rank, title, abstract, match_score):
