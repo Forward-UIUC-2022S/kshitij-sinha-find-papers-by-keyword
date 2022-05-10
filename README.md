@@ -270,9 +270,11 @@ The goal of this step is receive a set of query keywords and output a list of re
 ![Generate Embeddings](/media/rank_score.png)
 
 ## Issues and Future Work
-* The algorithm needs to be tested on papers that contain citation information. Currently, the module has either been tested on papers that only contain citations and titles, or on papers that only contain titles and abstracts. Further work needs to be done on papers that contain all three fields.
-* The algorithm has only been tested on a subset of papers (about 300,000 papers). The module still needs to be tested on a larger dataset of all MAG papers.
-* The 'find paper' function fails if it's given any keyword that doesn't exist in the FoS table. Ideally, the module should fail gracefully if given invalid keywords.
+* The algorithm has only been tested on a subset of MAG papers (about 1,000,000 papers). The module still needs to be tested on the whole MAG corpus. The same codebase can be used on the larger set. I will take approximately 10 days to complete the indexing process for the full MAG corpus (200 million papers)
+* There are currently a lot of separate components in the parallel ranking-generation processes. This includes 2 separate databases, multiple Azure servers. This system is not fully tested and may not be robust. There are multiple ways for the setup to fail:
+  * Azure servers are unable to access the UIUC databases without a VPN. 
+  * UIUC servers cannot edit the Azure servers because of a lack of permissions. To counteract this, a lot of the data is being transfered between servers as necessary, which is slow and inefficient. This setup can be significantly improved by consosolidating all the data on one database with read/write permissions.
+  * For an unknown reason, the Azure database cannot accept large query strings. This requires the Assignment step to work in batches to avoid creating a large WHERE IN () clause.
 
 ## References
 * Code examples from `Forward-UIUC-2021F/guidelines/keyword_assignments`
