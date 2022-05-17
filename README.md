@@ -303,7 +303,7 @@ The goal of this step is receive a set of query keywords and output a list of re
 
 | Script | Papers | Servers | Time |
 | - |-  | - | - |
-| `generate_parallel_embs.sh` | 1,000,000 | 40 | 13.3s |
+| `generate_parallel_embs.sh` | 1,000,000 | 40 | 13m 3s |
 | `find_papers.py` | 1,000,000 | N/A | 1m 15s | 
 
 ## Notes
