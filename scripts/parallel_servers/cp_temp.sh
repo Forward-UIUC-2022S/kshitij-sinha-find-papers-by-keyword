@@ -1,4 +1,4 @@
-# Argument 1: server password
+# Argument 1: server key location
 
 FILENAME="servers.txt"
 
@@ -7,7 +7,7 @@ LINES=$(cat $FILENAME)
 for LINE in $LINES
 do
     echo "Moving files" $LINE
-    sshpass -p $1 ssh fdlazure@$LINE "cp -R files/. ." &
+    ssh -i $1 fdlazure@$LINE "cp -R files/. ." &
 done
 wait
 echo "Finished moving all files"

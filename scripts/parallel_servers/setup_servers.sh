@@ -1,4 +1,4 @@
-# Argument 1: server password
+# Argument 1: server key location
 
 FILENAME="servers.txt"
 
@@ -6,7 +6,7 @@ LINES=$(cat $FILENAME)
 
 for LINE in $LINES
 do
-    sshpass -p $1 ssh fdlazure@$LINE "
+    ssh -i $1 fdlazure@$LINE "
         source /etc/profile
         git clone https://github.com/Forward-UIUC-2022S/kshitij-sinha-find-papers-by-keyword.git find_papers;
 

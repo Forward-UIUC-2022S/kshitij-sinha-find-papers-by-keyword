@@ -1,4 +1,4 @@
-# Argument 1: server password, Argument 2: Number of servers
+# Argument 1: ssh key location
 
 FILENAME="servers.txt"
 
@@ -8,7 +8,7 @@ ID=0
 for LINE in $LINES
 do
     echo "Beginning assigning keywords on server " $LINE
-    sshpass -p $1 ssh fdlazure@$LINE "
+    ssh -i $1 fdlazure@$LINE "
         cd find_papers
         source .venv/bin/activate;
         python3 src/assign_mag_kwds.py data/golden_words.csv data/keyword_embs.pickle data/other_freqs.pickle mag_data/mag_embs.pickle mag_data/mag_id_to_ind.pickle data/db_keywords.json data/assignments.csv;
