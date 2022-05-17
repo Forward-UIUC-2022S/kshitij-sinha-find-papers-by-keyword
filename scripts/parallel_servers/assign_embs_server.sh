@@ -2,10 +2,10 @@
 
 FILENAME="servers.txt"
 
-LINES=$(cat $FILENAME)
+servers=$(cat $FILENAME)
 ID=0
 
-for LINE in $LINES
+for LINE in $servers
 do
     echo "Beginning assigning keywords on server " $LINE
     ssh -i $1 fdlazure@$LINE "
@@ -20,9 +20,9 @@ echo "Finished assigning keywords"
 echo "Copying moving papers to assignments/"
 
 mkdir -p assignments
-for LINE in $LINES
+for LINE in $servers
 do
-    echo "scp-ing files from server " $LINE
+    echo "scp-ing files from server" $LINE
     scp -i $1 fdlazure@$LINE:find_papers/data/assignments.csv assignments/$LINE.csv
     ID=$((ID+1))
 done

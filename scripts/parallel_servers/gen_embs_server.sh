@@ -2,10 +2,10 @@
 
 FILENAME="servers.txt"
 
-LINES=$(cat $FILENAME)
+servers=$(cat $FILENAME)
 ID=0
 
-for LINE in $LINES
+for LINE in $servers
 do
     echo "Beginning generation on server " $LINE
     ssh -i $1 fdlazure@$LINE "

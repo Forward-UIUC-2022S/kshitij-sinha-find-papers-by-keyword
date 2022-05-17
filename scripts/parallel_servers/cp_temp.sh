@@ -2,9 +2,9 @@
 
 FILENAME="servers.txt"
 
-LINES=$(cat $FILENAME)
+servers=$(cat $FILENAME)
 
-for LINE in $LINES
+for LINE in $servers
 do
     echo "Moving files" $LINE
     ssh -i $1 fdlazure@$LINE "cp -R files/. ." &
