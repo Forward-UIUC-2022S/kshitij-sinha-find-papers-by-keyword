@@ -23,6 +23,6 @@ mkdir -p assignments
 for LINE in $LINES
 do
     echo "scp-ing files from server " $LINE
-    sshpass -p $1 scp fdlazure@$LINE:find_papers/data/assignments.csv assignments/$LINE.csv
+    scp -i $1 fdlazure@$LINE:find_papers/data/assignments.csv assignments/$LINE.csv
     ID=$((ID+1))
 done
