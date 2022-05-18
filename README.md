@@ -258,6 +258,7 @@ The overall architecture of this module is outlined in the diagram below.
 
 ### 1: Generate Embeddings
 In this step, we will create a vector embedding for every paper on our dataset. This will be done through the Python library `Sentence Transformers`. For every paper, we will concatenate the paper title and abstract, and use this string to genereate a vector embedding. We will do the same for every keyword.
+
 ![Generate Embeddings](/media/1_GenerateEmbeddings.png)
 
 ### 2: Assign To Keywords
