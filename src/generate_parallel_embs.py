@@ -1,4 +1,5 @@
 import sys
+import mysql.connector
 
 from find_papers_by_keyword.parallel_mag_embs_generator import ParallelMagEmbsGenerator
 import  database.db_conn_factory as db_factory

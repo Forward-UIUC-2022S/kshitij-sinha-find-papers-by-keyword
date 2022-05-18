@@ -91,7 +91,7 @@ def save_ids(forward_db):
     with forward_db.cursor() as cur, open(id_file, "wb") as out_file:
         cur.execute(sql)
         ids = cur.fetchall()
-        ids = [i[0] for i in ids]
+        ids = sorted([int(i[0]) for i in ids])
 
         print(f"Saving {len(ids)} paper ids to data/PaperIds.pickle")
         pickle.dump(ids, out_file)

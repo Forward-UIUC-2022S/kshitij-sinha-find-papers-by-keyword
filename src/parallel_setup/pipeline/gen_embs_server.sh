@@ -1,14 +1,14 @@
-# Argument 1: server password, Argument 2: Number of servers
+# Argument 1: server key location
 
 FILENAME="servers.txt"
 
-LINES=$(cat $FILENAME)
+servers=$(cat $FILENAME)
 ID=0
 
-for LINE in $LINES
+for LINE in $servers
 do
     echo "Beginning generation on server " $LINE
-    sshpass -p $1 ssh fdlazure@$LINE "
+    ssh -i $1 fdlazure@$LINE "
         cd find_papers
         source .venv/bin/activate;
         mkdir -p mag_data;

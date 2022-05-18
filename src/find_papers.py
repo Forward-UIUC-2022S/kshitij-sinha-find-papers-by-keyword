@@ -1,3 +1,5 @@
+import mysql.connector
+
 from find_papers_by_keyword.paper_search_engine import PaperSearchEngine
 import database.db_conn_factory as db_factory
 import argparse
@@ -17,7 +19,7 @@ def main():
     args = parser.parse_args()
 
     db_connection = db_factory.get_forward_db()
-
+    
     engine = PaperSearchEngine(db_connection)
     search_results = engine.get_relevant_papers(
         args.keywords, 15)
