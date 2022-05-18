@@ -289,11 +289,24 @@ The goal of this step is receive a set of query keywords and output a list of re
 ![Generate Embeddings](/media/rank_score.png)
 
 ## Issues and Future Work
+* Currently, Step 3 (`find_papers.py`) takes significantly longer than it should. See [Performance Analysis](#performance-analysis). This could be caused by an old MySQL version; the script is currently running on Owl2. We need to try running the script on Osprey2 to see an updated SQL version improves the runtime. The bottleneck is found in the `paper_search_engine.py` file in the following subquery.
+
+    ```sql
+    SELECT parent_id, Publication_id, MAX(npmi * score) as max_score
+    FROM Top_Keywords
+    JOIN Publication_FoS ON id = Publication_FoS.FoS_id
+    GROUP BY parent_id, Publication_id
+    ```
+* The [Rank Score Algorithm](#3-find-papers-by-keywords) is currently scaled by citation count: `cit(p_k) + 1`. This seems to incorrectly inflate rank scores for papers that would otherwise have low match scores, given that they have many citations. 
+
+    The algorithm could potentially be improved by scaling by a log factor: `log(cit(p_k) + 1)`
 * The algorithm has only been tested on a subset of MAG papers (about 1,000,000 papers). The module still needs to be tested on the whole MAG corpus. The same codebase can be used on the larger set. I will take approximately 10 days to complete the indexing process for the full MAG corpus (200 million papers)
 * There are currently a lot of separate components in the parallel ranking-generation processes. This includes 2 separate databases, multiple Azure servers. This system is not fully tested and may not be robust. There are multiple ways for the setup to fail:
   * Azure servers are unable to access the UIUC databases without a VPN. 
   * UIUC servers cannot edit the Azure servers because of a lack of permissions. To counteract this, a lot of the data is being transfered between servers as necessary, which is slow and inefficient. This setup can be significantly improved by consosolidating all the data on one database with read/write permissions.
   * For an unknown reason, the Azure database cannot accept large query strings. This requires the Assignment step to work in batches to avoid creating a large WHERE IN () clause.
+
+  Consolodating all the data on a single Azure database could significantly improve runtimes and code quality. 
 
 ## References
 * Code examples from `Forward-UIUC-2021F/guidelines/keyword_assignments`
